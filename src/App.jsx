@@ -4,7 +4,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 // const APP_VERSION = '1.001'
 // const APP_VERSION = '1.002'
 // const APP_VERSION = '1.003'
-const APP_VERSION = '1.004'
+// const APP_VERSION = '1.004'
+// const APP_VERSION = '1.005'
+const APP_VERSION = '1.006'
 
 const STORE_KEY = 'getmeoutofthis-settings'
 const FACE_DOWN_BETA = 150 // |beta| above this angle = screen facing the table
@@ -520,7 +522,8 @@ export default function App() {
         <img className="home-photo" src="/hero.jpg" alt="A man talking excitedly on a date while the woman looks bored" />
         <div className="home-bottom">
           <button className="help-me" onClick={() => setPhase('setup')}>
-            Help Me
+            {/* Help Me */}
+            Get Me Out of This
           </button>
           <div className="version">Version {APP_VERSION}</div>
         </div>
@@ -583,7 +586,24 @@ export default function App() {
     )
   }
 
+  // While armed or counting, look like an ordinary iPhone home screen.
+  // A faint "Stop" pill sits in the empty space right of the last app row.
   if (phase === 'armed' || phase === 'counting') {
+    return (
+      <div className="decoy-screen">
+        <div className="decoy-frame">
+          <img className="decoy-photo" src="/decoy-home.jpg" alt="" draggable="false" />
+          <button className="decoy-stop" onClick={disarm} aria-label="Stop">
+            Stop
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Previous armed/counting status screen - no longer shown, kept for reference.
+  // if (phase === 'armed' || phase === 'counting') {
+  if (false && (phase === 'armed' || phase === 'counting')) {
     return (
       <div className="app">
         <h1>GetMeOutOfThis</h1>

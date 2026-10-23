@@ -374,7 +374,7 @@ button.help-me {
   color: rgba(255, 255, 255, 0.7);
 }
 
-/* ---------- decoy iPhone home screen (shown after Start) ---------- */
+/* Previous decoy styles (v1.006) - cropped the bottom of the screenshot, kept for reference.
 .decoy-screen {
   position: fixed;
   inset: 0;
@@ -385,7 +385,6 @@ button.help-me {
   -webkit-touch-callout: none;
 }
 
-/* Scaled like "cover", pinned to the top so the status bar and app grid line up. */
 .decoy-frame {
   position: absolute;
   top: 0;
@@ -402,7 +401,6 @@ button.help-me {
   pointer-events: none;
 }
 
-/* Faint pill in the empty spot to the right of the Brightside row. */
 button.decoy-stop {
   position: absolute;
   left: 60%;
@@ -418,4 +416,92 @@ button.decoy-stop {
   letter-spacing: 0.02em;
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
+}
+*/
+
+/* ---------- decoy iPhone home screen (shown after Start) ---------- */
+.decoy-screen {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: rgb(214, 210, 177);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Blurred copy of the wallpaper fills any gap at the sides, like a real wallpaper would. */
+.decoy-backdrop {
+  position: absolute;
+  inset: -40px;
+  width: calc(100% + 80px);
+  height: calc(100% + 80px);
+  object-fit: cover;
+  filter: blur(28px) saturate(1.1);
+  pointer-events: none;
+}
+
+/* Whole screenshot always visible: scaled to fit, pinned to the top. */
+.decoy-frame {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100vw, calc(100dvh * 1179 / 2556));
+  aspect-ratio: 1179 / 2556;
+  container-type: inline-size;
+}
+
+.decoy-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Stop looks like one more app in the empty slot next to Brightside. */
+button.decoy-stop {
+  position: absolute;
+  left: 22.7%;
+  top: 67.35%;
+  width: 31.6%;
+  padding: 0;
+  border: 0;
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5cqw;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.decoy-stop-icon {
+  width: 50.8%;
+  aspect-ratio: 1;
+  border-radius: 22.5%;
+  background: linear-gradient(160deg, #6b6f76, #2f3237);
+  box-shadow: 0 0.6cqw 1.6cqw rgba(0, 0, 0, 0.22), inset 0 0 0 0.25cqw rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.decoy-stop-icon::before {
+  content: '';
+  width: 36%;
+  aspect-ratio: 1;
+  border-radius: 18%;
+  background: #f5f5f7;
+}
+
+button.decoy-stop:active .decoy-stop-icon {
+  filter: brightness(0.7);
+}
+
+.decoy-stop-label {
+  color: #fff;
+  font-size: 3.85cqw;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-shadow: 0 0.2cqw 0.8cqw rgba(0, 0, 0, 0.35);
 }

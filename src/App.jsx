@@ -6,7 +6,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 // const APP_VERSION = '1.003'
 // const APP_VERSION = '1.004'
 // const APP_VERSION = '1.005'
-const APP_VERSION = '1.006'
+// const APP_VERSION = '1.006'
+const APP_VERSION = '1.007'
 
 const STORE_KEY = 'getmeoutofthis-settings'
 const FACE_DOWN_BETA = 150 // |beta| above this angle = screen facing the table
@@ -264,6 +265,16 @@ export default function App() {
     settingsRef.current = settings
     saveSettings(settings)
   }, [settings])
+
+  // ---------- decoy colors: tint the page and Safari's bars to match the wallpaper ----------
+  useEffect(() => {
+    const decoy = phase === 'armed' || phase === 'counting'
+    const color = decoy ? 'rgb(214, 210, 177)' : ''
+    document.documentElement.style.background = color
+    document.body.style.background = color
+    const meta = document.querySelector('meta[name="theme-color"]')
+    if (meta) meta.setAttribute('content', decoy ? '#d6d2b1' : '#0b0d10')
+  }, [phase])
 
   // ---------- wake lock (keeps the screen and timer alive while face down) ----------
   const requestWakeLock = useCallback(async () => {
@@ -591,10 +602,15 @@ export default function App() {
   if (phase === 'armed' || phase === 'counting') {
     return (
       <div className="decoy-screen">
+        <img className="decoy-backdrop" src="/decoy-home.jpg" alt="" draggable="false" />
         <div className="decoy-frame">
           <img className="decoy-photo" src="/decoy-home.jpg" alt="" draggable="false" />
+          {/* <button className="decoy-stop" onClick={disarm} aria-label="Stop"> */}
+          {/*   Stop */}
+          {/* </button> */}
           <button className="decoy-stop" onClick={disarm} aria-label="Stop">
-            Stop
+            <span className="decoy-stop-icon" />
+            <span className="decoy-stop-label">Stop</span>
           </button>
         </div>
       </div>

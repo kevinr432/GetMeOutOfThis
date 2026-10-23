@@ -505,3 +505,38 @@ button.decoy-stop:active .decoy-stop-icon {
   letter-spacing: -0.01em;
   text-shadow: 0 0.2cqw 0.8cqw rgba(0, 0, 0, 0.35);
 }
+
+/* ---------- SLOTS Solitaire decoy (replaces the home-screen decoy) ---------- */
+.decoy-screen.slots {
+  background: #000;
+}
+
+/* Fit the whole screenshot, centered on black. */
+.decoy-frame.slots {
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(100vw, calc(100dvh * 1179 / 2197));
+  aspect-ratio: 1179 / 2197;
+}
+
+/* Small, dim pill in the game's colors, under Play Now. */
+button.decoy-stop-slots {
+  position: absolute;
+  left: 50%;
+  top: 94.4%;
+  transform: translateX(-50%);
+  width: 26%;
+  padding: 1.6cqw 0;
+  border: 0.3cqw solid rgba(156, 52, 36, 0.55);
+  border-radius: 2.4cqw;
+  background: rgba(224, 192, 128, 0.18);
+  color: rgba(232, 200, 140, 0.7);
+  font-size: 3.6cqw;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.decoy-stop-slots:active {
+  background: rgba(224, 192, 128, 0.35);
+}

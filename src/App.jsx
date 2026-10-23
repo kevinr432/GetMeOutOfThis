@@ -8,7 +8,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 // const APP_VERSION = '1.005'
 // const APP_VERSION = '1.006'
 // const APP_VERSION = '1.007'
-const APP_VERSION = '1.008'
+// const APP_VERSION = '1.008'
+const APP_VERSION = '1.009'
 
 const STORE_KEY = 'getmeoutofthis-settings'
 const FACE_DOWN_BETA = 150 // |beta| above this angle = screen facing the table
@@ -270,11 +271,13 @@ export default function App() {
   // ---------- decoy colors: tint the page and Safari's bars to match the wallpaper ----------
   useEffect(() => {
     const decoy = phase === 'armed' || phase === 'counting'
-    const color = decoy ? 'rgb(214, 210, 177)' : ''
+    // const color = decoy ? 'rgb(214, 210, 177)' : ''
+    const color = decoy ? '#000' : ''
     document.documentElement.style.background = color
     document.body.style.background = color
     const meta = document.querySelector('meta[name="theme-color"]')
-    if (meta) meta.setAttribute('content', decoy ? '#d6d2b1' : '#0b0d10')
+    // if (meta) meta.setAttribute('content', decoy ? '#d6d2b1' : '#0b0d10')
+    if (meta) meta.setAttribute('content', decoy ? '#000000' : '#0b0d10')
   }, [phase])
 
   // ---------- wake lock (keeps the screen and timer alive while face down) ----------
@@ -604,16 +607,23 @@ export default function App() {
   // A faint "Stop" pill sits in the empty space right of the last app row.
   if (phase === 'armed' || phase === 'counting') {
     return (
-      <div className="decoy-screen">
-        <img className="decoy-backdrop" src="/decoy-home.jpg" alt="" draggable="false" />
-        <div className="decoy-frame">
-          <img className="decoy-photo" src="/decoy-home.jpg" alt="" draggable="false" />
+      // <div className="decoy-screen">
+      <div className="decoy-screen slots">
+        {/* <img className="decoy-backdrop" src="/decoy-home.jpg" alt="" draggable="false" /> */}
+        {/* <div className="decoy-frame"> */}
+        <div className="decoy-frame slots">
+          {/* <img className="decoy-photo" src="/decoy-home.jpg" alt="" draggable="false" /> */}
+          <img className="decoy-photo" src="/decoy-slots.jpg" alt="" draggable="false" />
           {/* <button className="decoy-stop" onClick={disarm} aria-label="Stop"> */}
           {/*   Stop */}
           {/* </button> */}
-          <button className="decoy-stop" onClick={disarm} aria-label="Stop">
-            <span className="decoy-stop-icon" />
-            <span className="decoy-stop-label">Stop</span>
+          {/* <button className="decoy-stop" onClick={disarm} aria-label="Stop"> */}
+          {/*   <span className="decoy-stop-icon" /> */}
+          {/*   <span className="decoy-stop-label">Stop</span> */}
+          {/* </button> */}
+          {/* Slots decoy: a small, dim Stop below the Play Now button */}
+          <button className="decoy-stop-slots" onClick={disarm} aria-label="Stop">
+            Stop
           </button>
         </div>
       </div>

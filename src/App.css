@@ -272,3 +272,11 @@ button.secondary {
     box-shadow: 0 0 0 14px rgba(48, 209, 88, 0);
   }
 }
+
+.version {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}

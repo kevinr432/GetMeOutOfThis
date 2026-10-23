@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+// Bump by .001 with every update so you can tell the new version has loaded.
+const APP_VERSION = '1.001'
+
 const STORE_KEY = 'getmeoutofthis-settings'
 const FACE_DOWN_BETA = 150 // |beta| above this angle = screen facing the table
 const FACE_UP_BETA = 120 // |beta| below this angle = picked up / turned over
@@ -413,6 +416,7 @@ export default function App() {
         <button className="stop" onClick={disarm}>
           Stop
         </button>
+        <div className="version">Version {APP_VERSION}</div>
       </div>
     )
   }
@@ -449,6 +453,7 @@ export default function App() {
       <button className="primary" onClick={arm}>
         Start
       </button>
+      <div className="version">Version {APP_VERSION}</div>
     </div>
   )
 }

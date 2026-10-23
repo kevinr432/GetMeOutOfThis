@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 // Bump by .001 with every update so you can tell the new version has loaded.
-const APP_VERSION = '1.001'
+// const APP_VERSION = '1.001'
+const APP_VERSION = '1.002'
 
 const STORE_KEY = 'getmeoutofthis-settings'
 const FACE_DOWN_BETA = 150 // |beta| above this angle = screen facing the table
@@ -33,7 +34,9 @@ function formatTime(ms) {
 }
 
 // // Classic North American ring: 440 Hz + 480 Hz together, 2 s on / 4 s off.
-// Cell-phone style ringtone: an original marimba-like melody that repeats with no long gaps.
+// // Cell-phone style ringtone: an original marimba-like melody that repeats with no long gaps.
+// Classic telephone bell: a striker hammers two metal bells ~20 times a second, 2 s on / 4 s off.
+// A ringtone file chosen by the user replaces the bell when one is set.
 function createRinger(ctx) {
   let timer = null
   let oscillators = []
@@ -57,49 +60,119 @@ function createRinger(ctx) {
   //   if (navigator.vibrate) navigator.vibrate([1000, 200, 800])
   // }
 
-  // One mallet hit: a sine at the note plus a quieter, faster-fading overtone at 4x, like a marimba bar.
-  function note(freq, when) {
-    const parts = [
-      { mult: 1, peak: 0.45, decay: 0.45 },
-      { mult: 4, peak: 0.08, decay: 0.08 },
-    ]
-    parts.forEach(({ mult, peak, decay }) => {
-      const osc = ctx.createOscillator()
+  // // One mallet hit: a sine at the note plus a quieter, faster-fading overtone at 4x, like a marimba bar.
+  // function note(freq, when) {
+  //   const parts = [
+  //     { mult: 1, peak: 0.45, decay: 0.45 },
+  //     { mult: 4, peak: 0.08, decay: 0.08 },
+  //   ]
+  //   parts.forEach(({ mult, peak, decay }) => {
+  //     const osc = ctx.createOscillator()
+  //     const g = ctx.createGain()
+  //     osc.type = 'sine'
+  //     osc.frequency.value = freq * mult
+  //     g.gain.setValueAtTime(0.0001, when)
+  //     g.gain.exponentialRampToValueAtTime(peak, when + 0.005)
+  //     g.gain.exponentialRampToValueAtTime(0.0001, when + decay)
+  //     osc.connect(g)
+  //     g.connect(ctx.destination)
+  //     osc.start(when)
+  //     osc.stop(when + decay + 0.05)
+  //     oscillators.push(osc)
+  //   })
+  // }
+
+  // // E major arpeggio phrase, played twice with a different ending (seconds, Hz).
+  // const MELODY = [
+  //   [0.0, 1318.5], [0.15, 987.8], [0.3, 1318.5], [0.45, 830.6], [0.6, 987.8], [0.75, 1318.5],
+  //   [1.05, 1318.5], [1.2, 987.8], [1.35, 1318.5], [1.5, 1108.7], [1.65, 987.8], [1.8, 830.6],
+  // ]
+  // const LOOP_MS = 2400
+
+  // function burst() {
+  //   const t = ctx.currentTime + 0.05
+  //   oscillators = oscillators.slice(-60)
+  //   MELODY.forEach(([offset, freq]) => note(freq, t + offset))
+  //   if (navigator.vibrate) navigator.vibrate([400, 200, 400])
+  // }
+
+  // Inharmonic overtones of a small metal bell (frequency multiple, relative loudness).
+  const BELL_PARTIALS = [
+    [1, 1],
+    [2.76, 0.5],
+    [5.4, 0.25],
+    [8.93, 0.12],
+  ]
+  const BELLS = [950, 1180] // two gongs, struck alternately
+  const STRIKE_PERIOD = 0.05 // each bell is hit 20 times a second
+  const RING_SECONDS = 2
+  const RING_CYCLE_MS = 6000 // 2 s ringing + 4 s silence
+
+  const master = ctx.createGain()
+  master.gain.value = 0.8
+  master.connect(ctx.destination)
+
+  let customBuffer = null
+  let customSource = null
+
+  function bell(t) {
+    BELLS.forEach((freq, i) => {
       const g = ctx.createGain()
-      osc.type = 'sine'
-      osc.frequency.value = freq * mult
-      g.gain.setValueAtTime(0.0001, when)
-      g.gain.exponentialRampToValueAtTime(peak, when + 0.005)
-      g.gain.exponentialRampToValueAtTime(0.0001, when + decay)
-      osc.connect(g)
-      g.connect(ctx.destination)
-      osc.start(when)
-      osc.stop(when + decay + 0.05)
-      oscillators.push(osc)
+      g.gain.setValueAtTime(0, t)
+      g.connect(master)
+      BELL_PARTIALS.forEach(([mult, amp]) => {
+        const osc = ctx.createOscillator()
+        const og = ctx.createGain()
+        osc.frequency.value = freq * mult
+        og.gain.value = amp
+        osc.connect(og)
+        og.connect(g)
+        osc.start(t)
+        osc.stop(t + RING_SECONDS + 0.4)
+        oscillators.push(osc)
+      })
+      const strikes = Math.round(RING_SECONDS / STRIKE_PERIOD)
+      for (let k = 0; k < strikes; k++) {
+        const ts = t + k * STRIKE_PERIOD + i * (STRIKE_PERIOD / 2)
+        g.gain.setValueAtTime(0.32, ts)
+        g.gain.setTargetAtTime(0.02, ts, 0.018)
+      }
+      g.gain.setTargetAtTime(0, t + RING_SECONDS, 0.08) // ring-out after the last strike
     })
   }
 
-  // E major arpeggio phrase, played twice with a different ending (seconds, Hz).
-  const MELODY = [
-    [0.0, 1318.5], [0.15, 987.8], [0.3, 1318.5], [0.45, 830.6], [0.6, 987.8], [0.75, 1318.5],
-    [1.05, 1318.5], [1.2, 987.8], [1.35, 1318.5], [1.5, 1108.7], [1.65, 987.8], [1.8, 830.6],
-  ]
-  const LOOP_MS = 2400
-
   function burst() {
     const t = ctx.currentTime + 0.05
-    oscillators = oscillators.slice(-60)
-    MELODY.forEach(([offset, freq]) => note(freq, t + offset))
-    if (navigator.vibrate) navigator.vibrate([400, 200, 400])
+    oscillators = oscillators.slice(-32)
+    bell(t)
+    if (navigator.vibrate) navigator.vibrate([1000, 200, 800])
   }
+
+  function playCustom() {
+    customSource = ctx.createBufferSource()
+    customSource.buffer = customBuffer
+    customSource.loop = true
+    customSource.connect(master)
+    customSource.start()
+  }
+
 
   return {
     start() {
       this.stop()
       ctx.resume()
-      burst()
+      // burst()
       // timer = setInterval(burst, 6000)
-      timer = setInterval(burst, LOOP_MS)
+      // timer = setInterval(burst, LOOP_MS)
+      if (customBuffer) {
+        playCustom()
+      } else {
+        burst()
+        timer = setInterval(burst, RING_CYCLE_MS)
+      }
+    },
+    setCustom(buffer) {
+      customBuffer = buffer
     },
     stop() {
       clearInterval(timer)
@@ -112,10 +185,45 @@ function createRinger(ctx) {
         }
       })
       oscillators = []
+      if (customSource) {
+        try {
+          customSource.stop()
+        } catch {
+          /* already stopped */
+        }
+        customSource = null
+      }
       if (navigator.vibrate) navigator.vibrate(0)
     },
   }
 }
+
+// ---------- saved ringtone file (IndexedDB - too big for localStorage) ----------
+const DB_NAME = 'getmeoutofthis'
+const DB_STORE = 'files'
+
+function openDb() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1)
+    req.onupgradeneeded = () => req.result.createObjectStore(DB_STORE)
+    req.onsuccess = () => resolve(req.result)
+    req.onerror = () => reject(req.error)
+  })
+}
+
+async function dbRun(mode, fn) {
+  const db = await openDb()
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(DB_STORE, mode)
+    const req = fn(tx.objectStore(DB_STORE))
+    tx.oncomplete = () => resolve(req && req.result)
+    tx.onerror = () => reject(tx.error)
+  })
+}
+
+const loadTone = () => dbRun('readonly', (st) => st.get('ringtone')).catch(() => null)
+const saveTone = (blob, name) => dbRun('readwrite', (st) => st.put({ blob, name }, 'ringtone'))
+const clearTone = () => dbRun('readwrite', (st) => st.delete('ringtone'))
 
 export default function App() {
   const [settings, setSettings] = useState(loadSettings)
@@ -126,6 +234,10 @@ export default function App() {
   const [error, setError] = useState('')
   const [wakeLockOn, setWakeLockOn] = useState(false)
   const [callSeconds, setCallSeconds] = useState(0)
+  const [toneName, setToneName] = useState('') // '' = classic bell
+  const [previewing, setPreviewing] = useState(false)
+  const toneBlobRef = useRef(null)
+  const fileInputRef = useRef(null)
   const callStartRef = useRef(0)
 
   const phaseRef = useRef('setup')
@@ -234,12 +346,36 @@ export default function App() {
     return () => clearInterval(id)
   }, [phase])
 
+  // ---------- ringtone file ----------
+  useEffect(() => {
+    loadTone().then((saved) => {
+      if (saved && saved.blob) {
+        toneBlobRef.current = saved.blob
+        setToneName(saved.name || 'Custom ringtone')
+      }
+    })
+  }, [])
+
+  // Decode a sound file into the ringer. Returns false if the phone can't play it.
+  const applyToneBlob = useCallback(async (blob) => {
+    const ctx = audioCtxRef.current
+    if (!ctx || !blob) return false
+    try {
+      const buffer = await ctx.decodeAudioData(await blob.arrayBuffer())
+      ringerRef.current.setCustom(buffer)
+      return true
+    } catch {
+      return false
+    }
+  }, [])
+
   // ---------- arm / disarm ----------
   const unlockAudio = useCallback(() => {
     if (!audioCtxRef.current) {
       const Ctx = window.AudioContext || window.webkitAudioContext
       audioCtxRef.current = new Ctx()
       ringerRef.current = createRinger(audioCtxRef.current)
+      if (toneBlobRef.current) applyToneBlob(toneBlobRef.current)
     }
     // Ask iOS to play through the speaker even when the ring/silent switch is on silent.
     try {
@@ -248,7 +384,55 @@ export default function App() {
       /* not supported */
     }
     audioCtxRef.current.resume()
-  }, [])
+  }, [applyToneBlob])
+
+  const stopPreview = () => {
+    if (previewing) ringerRef.current?.stop()
+    setPreviewing(false)
+  }
+
+  const togglePreview = () => {
+    if (previewing) {
+      stopPreview()
+      return
+    }
+    unlockAudio()
+    ringerRef.current.start()
+    setPreviewing(true)
+  }
+
+  const onToneChosen = async (e) => {
+    const file = e.target.files && e.target.files[0]
+    e.target.value = ''
+    if (!file) return
+    setError('')
+    stopPreview()
+    unlockAudio()
+    const ok = await applyToneBlob(file)
+    if (!ok) {
+      setError(`"${file.name}" couldn't be played. Try an MP3 or M4A file.`)
+      return
+    }
+    toneBlobRef.current = file
+    setToneName(file.name)
+    try {
+      await saveTone(file, file.name)
+    } catch {
+      setError('Ringtone will work now but could not be saved for next time.')
+    }
+  }
+
+  const useClassicBell = async () => {
+    stopPreview()
+    toneBlobRef.current = null
+    ringerRef.current?.setCustom(null)
+    setToneName('')
+    try {
+      await clearTone()
+    } catch {
+      /* ignore */
+    }
+  }
 
   const arm = async () => {
     setError('')
@@ -258,6 +442,7 @@ export default function App() {
     }
 
     // Must happen inside the tap so iOS lets us make sound later.
+    stopPreview()
     unlockAudio()
 
     if (typeof DeviceOrientationEvent === 'undefined') {
@@ -447,6 +632,31 @@ export default function App() {
           onChange={(e) => setSettings({ ...settings, callerName: e.target.value })}
         />
       </label>
+
+      <div className="tone">
+        <div className="tone-label">Ringtone</div>
+        <div className="tone-name">{toneName || 'Classic phone bell'}</div>
+        <div className="row">
+          <button className="secondary" onClick={() => fileInputRef.current.click()}>
+            Choose ringtone file
+          </button>
+          <button className="secondary" onClick={togglePreview}>
+            {previewing ? 'Stop preview' : 'Preview'}
+          </button>
+        </div>
+        {toneName && (
+          <button className="link" onClick={useClassicBell}>
+            Use classic phone bell instead
+          </button>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="audio/*,.mp3,.m4a,.m4r,.wav,.aac"
+          onChange={onToneChosen}
+          hidden
+        />
+      </div>
 
       {error && <div className="error">{error}</div>}
 

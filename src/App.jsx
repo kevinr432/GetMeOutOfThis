@@ -2,7 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 // Bump by .001 with every update so you can tell the new version has loaded.
 // const APP_VERSION = '1.001'
-const APP_VERSION = '1.002'
+// const APP_VERSION = '1.002'
+// const APP_VERSION = '1.003'
+const APP_VERSION = '1.004'
 
 const STORE_KEY = 'getmeoutofthis-settings'
 const FACE_DOWN_BETA = 150 // |beta| above this angle = screen facing the table
@@ -228,7 +230,8 @@ const clearTone = () => dbRun('readwrite', (st) => st.delete('ringtone'))
 export default function App() {
   const [settings, setSettings] = useState(loadSettings)
   // phase: setup -> armed (waiting for face down) -> counting -> ringing
-  const [phase, setPhaseState] = useState('setup')
+  // const [phase, setPhaseState] = useState('setup')
+  const [phase, setPhaseState] = useState('home') // home = photo screen with the Help Me button
   const [remaining, setRemaining] = useState(0)
   const [beta, setBeta] = useState(null)
   const [error, setError] = useState('')
@@ -240,7 +243,8 @@ export default function App() {
   const fileInputRef = useRef(null)
   const callStartRef = useRef(0)
 
-  const phaseRef = useRef('setup')
+  // const phaseRef = useRef('setup')
+  const phaseRef = useRef('home')
   const settingsRef = useRef(settings)
   const deadlineRef = useRef(0)
   const posRef = useRef({ stable: 'up', candidate: 'up', since: 0 })
@@ -274,7 +278,8 @@ export default function App() {
 
   useEffect(() => {
     const onVisible = () => {
-      if (document.visibilityState === 'visible' && phaseRef.current !== 'setup') requestWakeLock()
+      // if (document.visibilityState === 'visible' && phaseRef.current !== 'setup') requestWakeLock()
+      if (document.visibilityState === 'visible' && phaseRef.current !== 'setup' && phaseRef.current !== 'home') requestWakeLock()
     }
     document.addEventListener('visibilitychange', onVisible)
     return () => document.removeEventListener('visibilitychange', onVisible)
@@ -509,6 +514,20 @@ export default function App() {
   const callerLabel = settings.callerName.trim() || 'Unknown'
 
   // ---------- screens ----------
+  if (phase === 'home') {
+    return (
+      <div className="home-screen">
+        <img className="home-photo" src="/hero.jpg" alt="A man talking excitedly on a date while the woman looks bored" />
+        <div className="home-bottom">
+          <button className="help-me" onClick={() => setPhase('setup')}>
+            Help Me
+          </button>
+          <div className="version">Version {APP_VERSION}</div>
+        </div>
+      </div>
+    )
+  }
+
   if (phase === 'ringing') {
     return (
       <div className="call-screen">
@@ -608,7 +627,11 @@ export default function App() {
 
   return (
     <div className="app">
+      <button className="link back" onClick={() => setPhase('home')}>
+        ‹ Back
+      </button>
       <h1>GetMeOutOfThis</h1>
+      {/* <img className="hero" src="/hero.jpg" alt="A man talking excitedly on a date while the woman looks bored" /> */}
       <p className="lede">Set it, flip your phone face down, and it will ring with a fake incoming call when you need an exit.</p>
 
       <label>

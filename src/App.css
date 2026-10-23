@@ -540,3 +540,26 @@ button.decoy-stop-slots {
 button.decoy-stop-slots:active {
   background: rgba(224, 192, 128, 0.35);
 }
+
+/* "Cancel" covering the Share With Friend button exactly - matches the game's button style. */
+button.decoy-cancel-slots {
+  position: absolute;
+  left: 17.05%;
+  top: 76.55%;
+  width: 66%;
+  height: 7.2%;
+  padding: 0;
+  border: 0.45cqw solid #9b3b22;
+  border-radius: 2.6cqw;
+  background: rgb(221, 190, 125);
+  color: #8a2a17;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 4.6cqw;
+  font-weight: 800;
+  letter-spacing: 0.005em;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.decoy-cancel-slots:active {
+  filter: brightness(0.9);
+}

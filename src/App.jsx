@@ -9,7 +9,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 // const APP_VERSION = '1.006'
 // const APP_VERSION = '1.007'
 // const APP_VERSION = '1.008'
-const APP_VERSION = '1.009'
+// const APP_VERSION = '1.009'
+const APP_VERSION = '1.010'
 
 const STORE_KEY = 'getmeoutofthis-settings'
 const FACE_DOWN_BETA = 150 // |beta| above this angle = screen facing the table
@@ -622,8 +623,12 @@ export default function App() {
           {/*   <span className="decoy-stop-label">Stop</span> */}
           {/* </button> */}
           {/* Slots decoy: a small, dim Stop below the Play Now button */}
-          <button className="decoy-stop-slots" onClick={disarm} aria-label="Stop">
-            Stop
+          {/* <button className="decoy-stop-slots" onClick={disarm} aria-label="Stop"> */}
+          {/*   Stop */}
+          {/* </button> */}
+          {/* "Cancel" drawn over the Share With Friend button - this is how you stop the app */}
+          <button className="decoy-cancel-slots" onClick={disarm}>
+            Cancel
           </button>
         </div>
       </div>

@@ -7,7 +7,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 // const APP_VERSION = '1.004'
 // const APP_VERSION = '1.005'
 // const APP_VERSION = '1.006'
-const APP_VERSION = '1.007'
+// const APP_VERSION = '1.007'
+const APP_VERSION = '1.008'
 
 const STORE_KEY = 'getmeoutofthis-settings'
 const FACE_DOWN_BETA = 150 // |beta| above this angle = screen facing the table
@@ -365,13 +366,15 @@ export default function App() {
   }, [phase])
 
   // ---------- ringtone file ----------
+  // Ringtone choice is turned off for now - the classic phone bell is always used,
+  // so a previously saved ringtone file is no longer loaded.
   useEffect(() => {
-    loadTone().then((saved) => {
-      if (saved && saved.blob) {
-        toneBlobRef.current = saved.blob
-        setToneName(saved.name || 'Custom ringtone')
-      }
-    })
+    // loadTone().then((saved) => {
+    //   if (saved && saved.blob) {
+    //     toneBlobRef.current = saved.blob
+    //     setToneName(saved.name || 'Custom ringtone')
+    //   }
+    // })
   }, [])
 
   // Decode a sound file into the ringer. Returns false if the phone can't play it.
@@ -692,6 +695,7 @@ export default function App() {
         />
       </label>
 
+      {/* Ringtone choice turned off for now - classic phone bell is always used.
       <div className="tone">
         <div className="tone-label">Ringtone</div>
         <div className="tone-name">{toneName || 'Classic phone bell'}</div>
@@ -716,6 +720,7 @@ export default function App() {
           hidden
         />
       </div>
+      */}
 
       {error && <div className="error">{error}</div>}
 

@@ -10,7 +10,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 // const APP_VERSION = '1.007'
 // const APP_VERSION = '1.008'
 // const APP_VERSION = '1.009'
-const APP_VERSION = '1.010'
+// const APP_VERSION = '1.010'
+const APP_VERSION = '1.011'
 
 const STORE_KEY = 'getmeoutofthis-settings'
 const FACE_DOWN_BETA = 150 // |beta| above this angle = screen facing the table
@@ -630,6 +631,8 @@ export default function App() {
           <button className="decoy-cancel-slots" onClick={disarm}>
             Cancel
           </button>
+          {/* Invisible tap area over the picture's Play Now button - opens the real SLOTS Solitaire game */}
+          <a className="decoy-play-slots" href="https://slots-solitaire.vercel.app/" aria-label="Play Now" />
         </div>
       </div>
     )

@@ -29,28 +29,65 @@ function formatTime(ms) {
   return `${m}:${String(s).padStart(2, '0')}`
 }
 
-// Classic North American ring: 440 Hz + 480 Hz together, 2 s on / 4 s off.
+// // Classic North American ring: 440 Hz + 480 Hz together, 2 s on / 4 s off.
+// Cell-phone style ringtone: an original marimba-like melody that repeats with no long gaps.
 function createRinger(ctx) {
   let timer = null
   let oscillators = []
 
-  function burst() {
-    const t = ctx.currentTime
-    const gain = ctx.createGain()
-    gain.connect(ctx.destination)
-    gain.gain.setValueAtTime(0, t)
-    gain.gain.linearRampToValueAtTime(0.3, t + 0.03)
-    gain.gain.setValueAtTime(0.3, t + 1.95)
-    gain.gain.linearRampToValueAtTime(0, t + 2)
-    ;[440, 480].forEach((freq) => {
+  // function burst() {
+  //   const t = ctx.currentTime
+  //   const gain = ctx.createGain()
+  //   gain.connect(ctx.destination)
+  //   gain.gain.setValueAtTime(0, t)
+  //   gain.gain.linearRampToValueAtTime(0.3, t + 0.03)
+  //   gain.gain.setValueAtTime(0.3, t + 1.95)
+  //   gain.gain.linearRampToValueAtTime(0, t + 2)
+  //   ;[440, 480].forEach((freq) => {
+  //     const osc = ctx.createOscillator()
+  //     osc.frequency.value = freq
+  //     osc.connect(gain)
+  //     osc.start(t)
+  //     osc.stop(t + 2)
+  //     oscillators.push(osc)
+  //   })
+  //   if (navigator.vibrate) navigator.vibrate([1000, 200, 800])
+  // }
+
+  // One mallet hit: a sine at the note plus a quieter, faster-fading overtone at 4x, like a marimba bar.
+  function note(freq, when) {
+    const parts = [
+      { mult: 1, peak: 0.45, decay: 0.45 },
+      { mult: 4, peak: 0.08, decay: 0.08 },
+    ]
+    parts.forEach(({ mult, peak, decay }) => {
       const osc = ctx.createOscillator()
-      osc.frequency.value = freq
-      osc.connect(gain)
-      osc.start(t)
-      osc.stop(t + 2)
+      const g = ctx.createGain()
+      osc.type = 'sine'
+      osc.frequency.value = freq * mult
+      g.gain.setValueAtTime(0.0001, when)
+      g.gain.exponentialRampToValueAtTime(peak, when + 0.005)
+      g.gain.exponentialRampToValueAtTime(0.0001, when + decay)
+      osc.connect(g)
+      g.connect(ctx.destination)
+      osc.start(when)
+      osc.stop(when + decay + 0.05)
       oscillators.push(osc)
     })
-    if (navigator.vibrate) navigator.vibrate([1000, 200, 800])
+  }
+
+  // E major arpeggio phrase, played twice with a different ending (seconds, Hz).
+  const MELODY = [
+    [0.0, 1318.5], [0.15, 987.8], [0.3, 1318.5], [0.45, 830.6], [0.6, 987.8], [0.75, 1318.5],
+    [1.05, 1318.5], [1.2, 987.8], [1.35, 1318.5], [1.5, 1108.7], [1.65, 987.8], [1.8, 830.6],
+  ]
+  const LOOP_MS = 2400
+
+  function burst() {
+    const t = ctx.currentTime + 0.05
+    oscillators = oscillators.slice(-60)
+    MELODY.forEach(([offset, freq]) => note(freq, t + offset))
+    if (navigator.vibrate) navigator.vibrate([400, 200, 400])
   }
 
   return {
@@ -58,7 +95,8 @@ function createRinger(ctx) {
       this.stop()
       ctx.resume()
       burst()
-      timer = setInterval(burst, 6000)
+      // timer = setInterval(burst, 6000)
+      timer = setInterval(burst, LOOP_MS)
     },
     stop() {
       clearInterval(timer)

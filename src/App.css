@@ -574,3 +574,11 @@ a.decoy-play-slots {
   border-radius: 2.6cqw;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0.15);
 }
+
+/* Reminder under the description that the app must stay open. */
+.lede.keep-open {
+  margin-top: -10px;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 15px;
+}

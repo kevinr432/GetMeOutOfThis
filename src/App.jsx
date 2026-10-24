@@ -14,7 +14,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 // const APP_VERSION = '1.011'
 // const APP_VERSION = '1.012'
 // const APP_VERSION = '1.013'
-const APP_VERSION = '1.014'
+// const APP_VERSION = '1.014'
+const APP_VERSION = '1.015'
 
 const STORE_KEY = 'getmeoutofthis-settings'
 const FACE_DOWN_BETA = 150 // |beta| above this angle = screen facing the table
@@ -694,7 +695,8 @@ export default function App() {
       {/* <img className="hero" src="/hero.jpg" alt="A man talking excitedly on a date while the woman looks bored" /> */}
       {/* <p className="lede">Set it, flip your phone face down, and it will ring with a fake incoming call when you need an exit.</p> */}
       <p className="lede">Just set it. Then when you need an out, nonchalantly turn your phone face down. Your phone will ring with a fake incoming call. While the app idles, the screen will look like you were playing our card game, SLOTS (which is free and fun).</p>
-      <p className="lede keep-open">Keep this app open — it can't ring if you switch apps or lock the phone.</p>
+      {/* <p className="lede keep-open">Keep this app open — it can't ring if you switch apps or lock the phone.</p> */}
+      <p className="lede keep-open">Keep this app open with your volume at 50% — or higher. It can't ring if you switch apps or lock the phone.</p>
 
       <label>
         Ring after (minutes) face down

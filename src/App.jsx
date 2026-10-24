@@ -12,7 +12,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 // const APP_VERSION = '1.009'
 // const APP_VERSION = '1.010'
 // const APP_VERSION = '1.011'
-const APP_VERSION = '1.012'
+// const APP_VERSION = '1.012'
+const APP_VERSION = '1.013'
 
 const STORE_KEY = 'getmeoutofthis-settings'
 const FACE_DOWN_BETA = 150 // |beta| above this angle = screen facing the table
@@ -690,7 +691,8 @@ export default function App() {
       </button>
       <h1>GetMeOutOfThis</h1>
       {/* <img className="hero" src="/hero.jpg" alt="A man talking excitedly on a date while the woman looks bored" /> */}
-      <p className="lede">Set it, flip your phone face down, and it will ring with a fake incoming call when you need an exit.</p>
+      {/* <p className="lede">Set it, flip your phone face down, and it will ring with a fake incoming call when you need an exit.</p> */}
+      <p className="lede">Just set it. Then when you need an out, nonchalantly turn your phone face down. Your phone will ring with a fake incoming call. While the app idles, the screen will look like you were playing our card game, SLOTS (which is free and fun).</p>
 
       <label>
         Ring after (minutes) face down
